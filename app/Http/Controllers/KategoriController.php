@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\kategori;
 use Illuminate\Http\Request;
 
 class KategoriController extends Controller
@@ -11,15 +12,17 @@ class KategoriController extends Controller
      */
     public function index()
     {
-        //
+        $data['result']=kategori::all();
+        return view('kategori.index')->with($data);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $rules = [];
+        $data['result'] = null;
+            return view('kategori/form');
     }
 
     /**
@@ -27,7 +30,18 @@ class KategoriController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rules = [
+            'nama_kategori'=>'required|max:1000',
+        ];
+        $request->validate($rules);
+        $data = [
+            'nama_kategori'=> $request->nama_kategori
+        ];
+
+        $kategori= kategori::create($data);
+
+        if($kategori) return redirect('/')->with('success','data berhasil ditambahkan');
+        else return redirect('/')->with('error','data gagal ditambahkan');
     }
 
     /**
@@ -43,7 +57,8 @@ class KategoriController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $data['result'] = \App\Models\kategori::where('id_kategori',$id)->first();
+        return view ('kategori.form')->with($data);
     }
 
     /**
@@ -51,7 +66,18 @@ class KategoriController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $rules = [
+            'nama_kategori'=> 'required|max:100'
+        ];
+
+        $request->validate($rules);
+
+        $input = $request->all();
+        $result = \App\Models\kategori::where('id_kategori',$id)->first();
+        $status = $result->update($input);
+
+        if($status) return redirect('/')->with('success','data berhasil diubah');
+        else return redirect('/')->with('error','data gagal diubah');
     }
 
     /**
@@ -59,6 +85,10 @@ class KategoriController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $result = \App\Models\kategori::where('id_kategori',$id)->first();
+        $status = $result->delete();
+
+        if($status) return redirect('/')->with('success','data berhasil dihapus');
+        else return redirect('/')->with('error','data gagal dihapus');
     }
 }
