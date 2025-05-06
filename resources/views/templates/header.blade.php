@@ -44,19 +44,19 @@
 
                      <!-- Nav Item - Dashboard -->
                      <li class="nav-item">
-                            <a class="nav-link" href="index.html">
+                            <a class="nav-link" href="{{ url('/') }}">
                                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                                   <span>Dashboard</span></a>
+                                   <span>Kategori</span></a>
+                     </li>
+                     <li class="nav-item">
+                            <a class="nav-link" href="{{ url('produk') }}">
+                            <i class="fas fa-shopping-cart"></i>
+                                   <span>Produk</span></a>
                      </li>
                      <li class="nav-item">
                             <a class="nav-link" href="index.html">
-                                   <i class="fas fa-fw fa-tachometer-alt"></i>
-                                   <span>Dashboard</span></a>
-                     </li>
-                     <li class="nav-item">
-                            <a class="nav-link" href="index.html">
-                                   <i class="fas fa-fw fa-tachometer-alt"></i>
-                                   <span>Dashboard</span></a>
+                            <i class="fas fa-user"></i>
+                                   <span>User</span></a>
                      </li>
 
                      <!-- Divider -->

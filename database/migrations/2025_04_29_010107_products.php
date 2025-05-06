@@ -15,7 +15,9 @@ return new class extends Migration
             $table->increments('id_produk');
             $table->string('nama_produk',255);
             $table->integer('stok');
-            $table->decimal('harga');
+            $table->decimal('harga', 15, 2);
+            $table->unsignedInteger('id_kategori');
+            $table->foreign('id_kategori')->references('id_kategori')->on('categories')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('products');
     }
 };

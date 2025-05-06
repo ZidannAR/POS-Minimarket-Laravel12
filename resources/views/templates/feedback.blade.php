@@ -1,14 +1,36 @@
 @if (session('success'))
 
-<div class="alert alert-success" role="alert">
-{{ session('success') }}
+<style>
+    pace {
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif; 
+}
+</style>
+
+<div class="pace" role="alert">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'success',
+        text: "{{ session('success') }}"
+
+    });
+</script>
 </div>
 @endif
 
 @if (session('error'))
 
-<div class="alert alert-danger" role="alert">
-       {{ 'error' }}
+<div class="pace" role="alert">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'error',
+        text: "{{ session('error') }}"
+
+    });
+</script>
 </div>
 @endif
 

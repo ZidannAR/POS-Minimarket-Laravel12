@@ -12,7 +12,8 @@ class ProdukController extends Controller
      */
     public function index()
     {
-        return view('produk.index');
+        $data['result'] = \App\Models\produk::all();  // ambil semua produk
+    return view('produk.index', $data);
     }
 
     /**
@@ -20,7 +21,8 @@ class ProdukController extends Controller
      */
     public function create()
     {
-       
+        $data['result'] = null;
+    return view('produk/form', $data);
     }
 
     /**
@@ -29,11 +31,19 @@ class ProdukController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'id_produk'=> 'required|unique:products',
             'nama_produk' => 'required|max:100',
             'harga'=>'required',
-            'stok'=>'required'
+            'stok'=>'required',
+            'id_kategori'=>'required|exists:categories'
         ];
+        $request->validate($rules);
+
+        $input = $request->all();
+
+        $status = \App\Models\produk::create($input);
+
+        if ($status) return redirect('produk')->with('success','data berhasil ditambahkan');
+        else return redirect('produk')->with('error','data gagal ditambahkan');
     }
 
     /**
@@ -41,7 +51,7 @@ class ProdukController extends Controller
      */
     public function show(string $id)
     {
-        //
+        
     }
 
     /**
@@ -49,7 +59,8 @@ class ProdukController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $data['result'] = \App\Models\produk::where('id_produk',$id)->first();
+        return view('produk/form')->with($data);
     }
 
     /**
@@ -57,7 +68,20 @@ class ProdukController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $rules = [
+            'nama_produk' => 'required|max:100',
+            'harga'=>'required',
+            'stok'=>'required',
+            'id_kategori'=>'required|exists:categories,id_kategori'
+        ];
+        $request->validate($rules);
+
+        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori']);
+        $result = \App\Models\produk::where('id_produk',$id);
+        $status = $result->update($input);
+
+        if($status) return redirect('produk')->with('success','data berhasil diubah');
+        else return redirect('produk')->with('error','data gagal diubah');
     }
 
     /**
@@ -65,6 +89,10 @@ class ProdukController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $result = \App\Models\produk::where('id_produk',$id)->first();
+        $status = $result->delete();
+
+        if($status) return redirect('produk')->with('success','data berhasil dihapus');
+        else return redirect('produk')->with('error', 'data gagal dihapus');
     }
 }

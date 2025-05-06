@@ -5,12 +5,13 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3">
        
-        <button type="button" class="btn btn-primary btn-icon-split" data-toggle="modal" data-target="#tambahModal">
-            <span class="icon text-white-50">
-                <i class="fa fa-plus"></i>
-            </span>
-            <a href="{{ url('kategori/add') }}" class="text" style="text-decoration: none;">kategori</a>
-        </button>
+    <a href="{{ url('kategori/add') }}" class="btn btn-primary btn-icon-split" style="text-decoration: none;">
+    <span class="icon text-white-50">
+        <i class="fa fa-plus"></i>
+    </span>
+    <span class="text">Kategori</span>
+</a>
+
     </div>
     <div class="card-body">
     @yield('content')
