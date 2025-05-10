@@ -14,7 +14,7 @@
                      <h6>Data Tamu</h6>
               </div>
               <div class="card-body">
-              <form method="post" action="{{ isset($result) && $result ? route('produk.update', $result->id_produk) : url('produk/add') }}">
+              <form method="post" action="{{ isset($result) && $result ? route('produk.update', $result->id_produk) : url('produk/add') }}" enctype="multipart/form-data">
 
 
                             @csrf
@@ -49,6 +49,13 @@
                                     </option>
                                 @endforeach
                                 </select>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="control-label col-sm-2">Foto</label>
+                            <div class="col-sm-10">
+                                   <input type="file" name="foto"/>
+                            </div>
                         </div>
 
                             <div class="form-group row">

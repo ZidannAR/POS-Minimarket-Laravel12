@@ -9,7 +9,7 @@ class produk extends Model
     protected $table = 'products';
     protected $primaryKey = 'id_produk';
 
-    protected $fillable = ['nama_produk','harga','stok','id_kategori'];
+    protected $fillable = ['nama_produk','harga','stok','id_kategori','foto'];
 
     public function kategori(){
         return $this->belongsTo(kategori::class,'id_kategori','id_kategori');

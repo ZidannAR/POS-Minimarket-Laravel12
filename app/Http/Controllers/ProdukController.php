@@ -34,16 +34,22 @@ class ProdukController extends Controller
             'nama_produk' => 'required|max:100',
             'harga'=>'required',
             'stok'=>'required',
-            'id_kategori'=>'required|exists:categories'
+            'id_kategori'=>'required|exists:categories',
+            'foto'=> 'required|mimes:jpeg,png|max:512'
         ];
         $request->validate($rules);
 
-        $input = $request->all();
+        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori','foto']);
+        if ($request->hasFile('foto')&& $request -> file('foto')->isValid()){
+            $filename = uniqid(). "." . $request->file('foto')->getClientOriginalExtension();
+            $request-> file('foto')->move(public_path('upload'),$filename);
+            $input['foto']=$filename;
+            $status = \App\Models\produk::create($input);
+    
+            if ($status) return redirect('produk')->with('success','data berhasil ditambahkan');
+            else return redirect('produk')->with('error','data gagal ditambahkan');
+        }
 
-        $status = \App\Models\produk::create($input);
-
-        if ($status) return redirect('produk')->with('success','data berhasil ditambahkan');
-        else return redirect('produk')->with('error','data gagal ditambahkan');
     }
 
     /**
@@ -72,11 +78,17 @@ class ProdukController extends Controller
             'nama_produk' => 'required|max:100',
             'harga'=>'required',
             'stok'=>'required',
-            'id_kategori'=>'required|exists:categories,id_kategori'
+            'id_kategori'=>'required|exists:categories,id_kategori',
+            'foto'=>'required|mimes:jpeg,png|max:512'
         ];
         $request->validate($rules);
 
-        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori']);
+        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori','foto']);
+        if ($request->hasFile('foto')&& $request->file('foto')->isValid()) {
+            $filename = $input['foto'] . "." . $request->file('foto')->getClientOriginalExtension();
+            $request->file('foto')->move(public_path('upload'),$filename);
+            $input['foto'] = $filename;        
+        }
         $result = \App\Models\produk::where('id_produk',$id);
         $status = $result->update($input);
 
