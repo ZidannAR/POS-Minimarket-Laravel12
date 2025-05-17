@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::table('orders_detail', function (Blueprint $table) {
+    Schema::table('order_detail', function (Blueprint $table) {
         $table->integer('jumlah')->default(1);
     });
 }

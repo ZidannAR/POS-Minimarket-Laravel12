@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders_detail', function ($table) {
+        Schema::create('order_detail', function ($table) {
             $table->increments('id_detail');
 
             

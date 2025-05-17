@@ -27,6 +27,7 @@
                                 <div class="card-body text-center">
                                     <h5 class="card-title">{{ $products->nama_produk }}</h5>
                                     <p><strong>Rp {{ number_format($products->harga, 0, ',', '.') }}</strong></p>
+                                    <td>{{ $products->kategori->nama_kategori ?? '-' }}</td>
                                     <<form action="{{ route('cart.add') }}" method="POST">
 
                                         @csrf
@@ -115,102 +116,97 @@
                     </form>
                 </div>
 
-                <script>
-                    function hitungTotal() {
-                        let total = 0;
-                        const jumlahInputs = document.querySelectorAll('.jumlah-input');
+                <!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-                        jumlahInputs.forEach(input => {
-                            const harga = parseInt(input.dataset.harga);
-                            const jumlah = parseInt(input.value);
-                            total += harga * jumlah;
-                        });
 
-                        document.getElementById('total').value = total;
-                        document.getElementById('total_display').value = "Rp " + total.toLocaleString('id-ID');
-                        return total;
-                    }
+              <!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-                    document.addEventListener('DOMContentLoaded', function() {
-                        hitungTotal(); // Hitung saat halaman pertama kali dimuat
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputUang = document.getElementById('uang_diberikan');
+        const inputUangRaw = document.getElementById('uang_diberikan_raw');
+        const inputKembalian = document.getElementById('kembalian');
+        const inputTotal = document.getElementById('total');
+        const inputTotalDisplay = document.getElementById('total_display');
+        const formPembayaran = document.getElementById('payment-form');
 
-                        document.getElementById('uang_diberikan').addEventListener('input', function() {
-                            const total = hitungTotal();
-                            const uang = parseInt(this.value);
-                            const kembalianInput = document.getElementById('kembalian');
+        // Helper: Format Rupiah
+        function formatRupiah(angka, prefix = 'Rp ') {
+            let number_string = angka.toString().replace(/[^,\d]/g, ''),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-                            if (!isNaN(uang)) {
-                                const kembalian = uang - total;
-                                kembalianInput.value = kembalian >= 0 ? "Rp " + kembalian.toLocaleString('id-ID') : "Uang tidak cukup";
-                            } else {
-                                kembalianInput.value = '';
-                            }
-                        });
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
 
-                        document.getElementById('payment-form').addEventListener('submit', function(e) {
-                            const total = hitungTotal();
-                            const uang = parseInt(document.getElementById('uang_diberikan').value);
-                            if (uang < total || isNaN(uang)) {
-                                e.preventDefault();
-                                alert("Uang tidak cukup!");
-                            }
-                        });
-                    });
-                </script>
-                <script>
-                    function formatRupiah(angka, prefix = 'Rp ') {
-                        let number_string = angka.replace(/[^,\d]/g, '').toString(),
-                            split = number_string.split(','),
-                            sisa = split[0].length % 3,
-                            rupiah = split[0].substr(0, sisa),
-                            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+            rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix + rupiah;
+        }
 
-                        if (ribuan) {
-                            let separator = sisa ? '.' : '';
-                            rupiah += separator + ribuan.join('.');
-                        }
+        // Helper: Parse Rupiah
+        function parseRupiah(rupiahString) {
+            return parseInt(rupiahString.replace(/[^0-9]/g, '')) || 0;
+        }
 
-                        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
-                        return prefix + rupiah;
-                    }
+        // Hitung total belanja
+        function hitungTotal() {
+            let total = 0;
+            document.querySelectorAll('.jumlah-input').forEach(input => {
+                const harga = parseInt(input.dataset.harga);
+                const jumlah = parseInt(input.value);
+                total += harga * jumlah;
+            });
 
-                    function parseRupiah(rupiahString) {
-                        return parseInt(rupiahString.replace(/[^0-9]/g, '')) || 0;
-                    }
+            inputTotal.value = total;
+            inputTotalDisplay.value = formatRupiah(total);
+            return total;
+        }
 
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const inputUang = document.getElementById('uang_diberikan');
-                        const kembalianInput = document.getElementById('kembalian');
+        // Hitung kembalian berdasarkan input uang
+        function hitungKembalian() {
+            const total = hitungTotal();
+            const uang = parseRupiah(inputUang.value);
+            const kembalian = uang - total;
 
-                        // Format saat diketik
-                        inputUang.addEventListener('keyup', function(e) {
-                            this.value = formatRupiah(this.value);
+            inputKembalian.value = (kembalian >= 0)
+                ? formatRupiah(kembalian)
+                : 'Uang tidak cukup';
 
-                            const uang = parseRupiah(this.value);
-                            const total = parseInt(document.getElementById('total').value);
-                            const kembalian = uang - total;
+            inputUangRaw.value = uang;
+        }
 
-                            kembalianInput.value = (kembalian >= 0) ?
-                                "Rp " + kembalian.toLocaleString('id-ID') :
-                                "Uang tidak cukup";
-                        });
+        // Format input saat user mengetik
+        inputUang.addEventListener('keyup', function () {
+            this.value = formatRupiah(this.value);
+            hitungKembalian();
+        });
 
-                        // Hitung ulang kembalian saat submit (optional)
-                        document.getElementById('payment-form').addEventListener('submit', function(e) {
-                            const uang = parseRupiah(inputUang.value);
-                            const total = parseInt(document.getElementById('total').value);
-                            if (uang < total) {
-                                e.preventDefault();
-                                alert("Uang tidak cukup!");
-                            }
-                        });
-                    });
+        // Validasi sebelum submit
+        formPembayaran.addEventListener('submit', function (e) {
+            const total = parseInt(inputTotal.value);
+            const uang = parseRupiah(inputUang.value);
 
-                    document.getElementById('uang_diberikan').addEventListener('input', function() {
-                        let rawValue = this.value.replace(/[^0-9]/g, '');
-                        document.getElementById('uang_diberikan_raw').value = rawValue;
-                    });
-                </script>
+            if (uang < total) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Uang tidak cukup!'
+                });
+            }
+        });
+
+        // Inisialisasi awal
+        hitungTotal();
+    });
+</script>
+
 
 
 

@@ -30,7 +30,8 @@ Route::get('produk/{id}/edit', [ProdukController::class, 'edit'])->name('produk.
 Route::put('produk/{id}', [ProdukController::class, 'update'])->name('produk.update');
 Route::delete('produk/{id}/delete', [ProdukController::class, 'destroy']);
 
-Route::get('kasir',[KasirController::class,'index']);
+Route::get('kasir',[KasirController::class,'index'])->name('kasir.index');
+
 Route::post('cart/add',[KasirController::class,'store'])->name('cart.add');
 Route::post('cart/min/{id}',[KasirController::class,'kurang'])->name('cart.min');
 Route::post('cart/tambah/{id}',[KasirController::class,'tambah'])->name('cart.tambah');
