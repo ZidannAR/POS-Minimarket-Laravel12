@@ -38,7 +38,8 @@
                             <img src="{{ asset('upload/'.@$row->foto) }}" width="80px" class="img" alt="foto">
                         </td>
                         <td>{{ $row->nama_produk }}</td>
-                        <td>{{ $row->harga }}</td>
+                        <td>{{ 'Rp ' . number_format($row->harga, 0, ',', '.') }}</td>
+                
                         <td>{{ $row->stok }}</td>
                         <td>{{ $row->kategori->nama_kategori ?? '-' }}</td>
                         <td>

@@ -58,6 +58,11 @@
                             <i class="fas fa-user"></i>
                                    <span>User</span></a>
                      </li>
+                     <li class="nav-item">
+                            <a class="nav-link" href="{{ url('kasir') }}">
+                            <i class="fas fa-cash-register"></i> 
+                                   <span>Kasir</span></a>
+                     </li>
 
                      <!-- Divider -->
                      <hr class="sidebar-divider">
@@ -303,5 +308,6 @@
 
                             </nav>
                             <div class="content-wrapper">
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
        @yield('content')
   </div>

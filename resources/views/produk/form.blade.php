@@ -6,15 +6,15 @@
 <div class="container-fluid">
 
        <!-- Page Heading -->
-       <h1 class="h3 mb-4 text-gray-800">Tambah Kategori</h1>
+       <h1 class="h3 mb-4 text-gray-800">Tambah Produk</h1>
 
        <div class="card shadow mb-mp4">
-       @include('templates.feedback')
+              @include('templates.feedback')
               <div class="card-header py-3">
                      <h6>Data Tamu</h6>
               </div>
               <div class="card-body">
-              <form method="post" action="{{ isset($result) && $result ? route('produk.update', $result->id_produk) : url('produk/add') }}" enctype="multipart/form-data">
+                     <form method="post" action="{{ isset($result) && $result ? route('produk.update', $result->id_produk) : url('produk/add') }}" enctype="multipart/form-data">
 
 
                             @csrf
@@ -36,27 +36,29 @@
                             <div class="form-group row">
                                    <label class="col-sm-3 col-form-label">Harga</label>
                                    <div class="col-sm-8">
-                                          <input type="text" name="harga" class="form-control">
+                                          <input type="text" name="harga_display" id="harga" class="form-control" autocomplete="off">
+                                          <input type="hidden" name="harga" id="harga_raw">
+
                                    </div>
                             </div>
                             <div class="form-group row">
-                            <label for="id_kategori">Kelas</label>
-                            <select class="form-control" id="id_kategori" name="id_kategori">
-                                @foreach(\App\Models\kategori::all() as $kategori)
-                                    <option value="{{ $kategori->id_kategori }}"
-                                        {{ (!empty($result) && $result->id_kategori == $kategori->id_kategori) || old('id_kategori') == $kategori->id_kategori ? 'selected' : '' }}>
-                                        {{ $kategori->nama_kategori }}
-                                    </option>
-                                @endforeach
-                                </select>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="control-label col-sm-2">Foto</label>
-                            <div class="col-sm-10">
-                                   <input type="file" name="foto"/>
+                                   <label for="id_kategori">Kelas</label>
+                                   <select class="form-control" id="id_kategori" name="id_kategori">
+                                          @foreach(\App\Models\kategori::all() as $kategori)
+                                          <option value="{{ $kategori->id_kategori }}"
+                                                 {{ (!empty($result) && $result->id_kategori == $kategori->id_kategori) || old('id_kategori') == $kategori->id_kategori ? 'selected' : '' }}>
+                                                 {{ $kategori->nama_kategori }}
+                                          </option>
+                                          @endforeach
+                                   </select>
                             </div>
-                        </div>
+
+                            <div class="form-group row">
+                                   <label class="control-label col-sm-2">Foto</label>
+                                   <div class="col-sm-10">
+                                          <input type="file" name="foto" />
+                                   </div>
+                            </div>
 
                             <div class="form-group row">
                                    <div class="col-sm-8 offset-sm-3 d-flex justify-content-end">
@@ -72,6 +74,41 @@
                                    </div>
                             </div>
                      </form>
+                     <script>
+                            const hargaDisplay = document.getElementById('harga');
+                            const hargaRaw = document.getElementById('harga_raw');
+
+                            hargaDisplay.addEventListener('input', function(e) {
+                                   // Ambil hanya angka
+                                   let value = this.value.replace(/\D/g, '');
+
+                                   if (!value) {
+                                          this.value = '';
+                                          hargaRaw.value = '';
+                                          return;
+                                   }
+
+                                   // Format ke Rupiah
+                                   this.value = formatRupiah(value);
+                                   // Simpan angka murni di hidden input
+                                   hargaRaw.value = value;
+                            });
+
+                            function formatRupiah(angka) {
+                                   let numberString = angka.toString();
+                                   let sisa = numberString.length % 3;
+                                   let rupiah = numberString.substr(0, sisa);
+                                   let ribuan = numberString.substr(sisa).match(/\d{3}/g);
+
+                                   if (ribuan) {
+                                          let separator = sisa ? '.' : '';
+                                          rupiah += separator + ribuan.join('.');
+                                   }
+
+                                   return 'Rp ' + rupiah;
+                            }
+                     </script>
+
               </div>
        </div>
 

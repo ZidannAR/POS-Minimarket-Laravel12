@@ -9,20 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('categories',function(Blueprint $table){
-            $table->increments('id_kategori');
-            $table->string('nama_kategori');
-            $table->timestamps();
-        });
-    }
+    public function up()
+{
+    Schema::table('orders_detail', function (Blueprint $table) {
+        $table->integer('jumlah')->default(1);
+    });
+}
+
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        //
+        Schema::table('orders_detail', function (Blueprint $table) {
+            //
+        });
     }
 };
