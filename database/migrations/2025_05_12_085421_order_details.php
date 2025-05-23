@@ -13,17 +13,9 @@ return new class extends Migration
     {
         Schema::create('order_detail', function ($table) {
             $table->increments('id_detail');
-
-            
             $table->unsignedInteger('order_id');
-
-            // Kolom lain yang diperlukan
             $table->unsignedInteger('id_produk');
             $table->integer('harga');
-
-            
-
-            // Baru tambahkan foreign key
             $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');
             $table->foreign('id_produk')->references('id_produk')->on('products')->onDelete('cascade');
             $table->timestamps();

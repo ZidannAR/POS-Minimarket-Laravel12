@@ -5,50 +5,55 @@
 @section('content')
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-       
-    <a href="{{ url('produk/add') }}" class="btn btn-primary btn-icon-split" style="text-decoration: none;">
-    <span class="icon text-white-50">
-        <i class="fa fa-plus"></i>
-    </span>
-    <span class="text">Produk</span>
-</a>
+
+        <a href="{{ url('produk/add') }}" class="btn btn-primary btn-icon-split" style="text-decoration: none;">
+            <span class="icon text-white-50">
+                <i class="fa fa-plus"></i>
+            </span>
+            <span class="text">Produk</span>
+        </a>
 
     </div>
     <div class="card-body">
-    @yield('content')
-    @include('templates.feedback')
+        @yield('content')
+        @include('templates.feedback')
         <div class="table-responsive">
             <table class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>No</th>
                         <th>foto</th>
-                        <th >nama produk</th>
-                        <th >harga</th>
-                        <th >stok</th>
-                        <th >kategori</th>
+                        <th>SKU</th>
+                        <th>nama produk</th>
+                        <th>harga</th>
+                        <th>stok</th>
+                        <th>kategori</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                @foreach ($result as $row)
+                    @foreach ($result as $row)
                     <tr>
                         <td>{{ !empty($i) ? ++$i : $i = 1 }}</td>
                         <td>
                             <img src="{{ asset('upload/'.@$row->foto) }}" width="80px" class="img" alt="foto">
                         </td>
+                        <td>
+                            {!! DNS1D::getBarcodeHTML($row->sku, 'C128') !!}
+                            {{ $row->sku }}
+                        </td>
                         <td>{{ $row->nama_produk }}</td>
                         <td>{{ 'Rp ' . number_format($row->harga, 0, ',', '.') }}</td>
-                
+
                         <td>{{ $row->stok }}</td>
                         <td>{{ $row->kategori->nama_kategori ?? '-' }}</td>
                         <td>
                             <form action="{{ url('produk/' . $row->id_produk . '/delete') }}" method="post">
                                 <a class="btn btn-success" href="{{ url("produk/$row->id_produk/edit") }}">Ubah</a>
-                                   @csrf
-                                   @method('DELETE')
+                                @csrf
+                                @method('DELETE')
 
-                                   <button type="submit"class="btn btn-danger">Hapus</button>
+                                <button type="submit" class="btn btn-danger">Hapus</button>
                             </form>
                         </td>
                     </tr>

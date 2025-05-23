@@ -32,6 +32,7 @@ class ProdukController extends Controller
     {
         $rules = [
             'nama_produk' => 'required|max:100',
+            'sku'=>'required',
             'harga'=>'required',
             'stok'=>'required',
             'id_kategori'=>'required|exists:categories',
@@ -39,7 +40,7 @@ class ProdukController extends Controller
         ];
         $request->validate($rules);
 
-        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori','foto']);
+        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori','foto','sku']);
         if ($request->hasFile('foto')&& $request -> file('foto')->isValid()){
             $filename = uniqid(). "." . $request->file('foto')->getClientOriginalExtension();
             $request-> file('foto')->move(public_path('upload'),$filename);
@@ -76,6 +77,7 @@ class ProdukController extends Controller
     {
         $rules = [
             'nama_produk' => 'required|max:100',
+            'sku'=>'required',
             'harga'=>'required',
             'stok'=>'required',
             'id_kategori'=>'required|exists:categories,id_kategori',
@@ -83,7 +85,7 @@ class ProdukController extends Controller
         ];
         $request->validate($rules);
 
-        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori','foto']);
+        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori','foto'.'sku']);
         if ($request->hasFile('foto')&& $request->file('foto')->isValid()) {
             $filename = $input['foto'] . "." . $request->file('foto')->getClientOriginalExtension();
             $request->file('foto')->move(public_path('upload'),$filename);
@@ -106,5 +108,10 @@ class ProdukController extends Controller
 
         if($status) return redirect('produk')->with('success','data berhasil dihapus');
         else return redirect('produk')->with('error', 'data gagal dihapus');
+    }
+
+    public function barcode($id){
+        $produk = produk::findOrFail($id);
+        return view ('produk.print-barcode', compact('products'));
     }
 }

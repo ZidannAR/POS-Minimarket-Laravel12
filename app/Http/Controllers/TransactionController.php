@@ -12,14 +12,14 @@ class TransactionController extends Controller
     public function checkout(Request $request)
     {
         $keranjang = session('keranjang', []);
-        if(empty($keranjang)) {
+        if (empty($keranjang)) {
             return redirect()->back()->with('error', 'Keranjang kosong!');
         }
 
         $total = $request->input('total');
         $uangDiberikan = preg_replace('/\D/', '', $request->input('uang_diberikan')); // hapus formatting rupiah jadi angka
 
-        if($uangDiberikan < $total) {
+        if ($uangDiberikan < $total) {
             return redirect()->back()->with('error', 'Uang tidak cukup!');
         }
 
@@ -32,8 +32,8 @@ class TransactionController extends Controller
             $order->total = $total;
             $order->save();
 
-            // Simpan detail order
-            foreach($keranjang as $id => $item) {
+       
+            foreach ($keranjang as $id => $item) {
                 $detail = new OrderDetail();
                 $detail->order_id = $order->order_id;
                 $detail->id_produk = $id;
@@ -42,9 +42,15 @@ class TransactionController extends Controller
                 $detail->save();
             }
 
+            $produk = \App\Models\Produk::find($id);
+            if ($produk) {
+                $produk->stok -= $item['jumlah'];
+                $produk->save();
+            }
+
             DB::commit();
 
-            // Kosongkan keranjang
+           
             session()->forget('keranjang');
 
             return redirect()->route('kasir.index')->with('success', 'Transaksi berhasil!');
