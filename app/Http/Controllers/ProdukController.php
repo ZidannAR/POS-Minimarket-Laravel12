@@ -12,7 +12,7 @@ class ProdukController extends Controller
      */
     public function index()
     {
-        $data['result'] = \App\Models\produk::all();  // ambil semua produk
+        $data['result'] = \App\Models\produk::all();  
     return view('produk.index', $data);
     }
 

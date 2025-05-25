@@ -1,6 +1,8 @@
 <?php
 
 // use App\Http\Controllers\HomeController;
+
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdukController;
@@ -33,6 +35,8 @@ Route::post('cart/tambah/{id}',[KasirController::class,'tambah'])->name('cart.ta
 Route::delete('cart/destroy', [KasirController::class, 'destroy'])->name('cart.destroy'); 
 
 Route::post('kasir/scan-barcode', [KasirController::class, 'scanBarcode'])->name('barcode.search');
+
+Route::get('dashboard',[DashboardController::class,'index']);
 
 
 // Route::get('kasir',[KasirController::class,'']);
