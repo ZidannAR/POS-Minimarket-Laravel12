@@ -5,9 +5,15 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProdukController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransactionController;
+
+use App\Models\Customer;
+
+use Illuminate\Http\Request;
+
 
 
 
@@ -46,4 +52,18 @@ Route::get('dashboard',[DashboardController::class,'index']);
 
 Route::post('/checkout', [TransactionController::class, 'checkout'])->name('cart.checkout');
 
+
+
+Route::resource('member', 'App\Http\Controllers\MemberController'); 
+
+Route::get('/check-member', function (Request $request) {
+       $member = Customer::where('no_hp', $request->phone)
+                       ->where('status_member', true)
+                       ->first();
+   
+       return response()->json([
+           'is_member' => !!$member,
+           'member_data' => $member  
+       ]);
+   });
 // Route::resource('/',ProdukController::class);

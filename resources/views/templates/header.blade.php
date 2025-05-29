@@ -44,6 +44,11 @@
 
                      <!-- Nav Item - Dashboard -->
                      <li class="nav-item">
+                            <a class="nav-link" href="{{ url('dashboard') }}">
+                                   <i class="fas fa-fw fa-tachometer-alt"></i>
+                                   <span>Dashboard</span></a>
+                     </li>
+                     <li class="nav-item">
                             <a class="nav-link" href="{{ url('/') }}">
                                    <i class="fas fa-fw fa-tachometer-alt"></i>
                                    <span>Kategori</span></a>
@@ -55,6 +60,11 @@
                      </li>
                      <li class="nav-item">
                             <a class="nav-link" href="index.html">
+                            <i class="fas fa-user"></i>
+                                   <span>User</span></a>
+                     </li>
+                     <li class="nav-item">
+                            <a class="nav-link" href="{{ url('member') }}">
                             <i class="fas fa-user"></i>
                                    <span>User</span></a>
                      </li>

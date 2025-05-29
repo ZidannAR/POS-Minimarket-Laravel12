@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('customers',function(Blueprint $table){
             $table->increments('id_customers');
-            $table->timestamps();
+        $table->string('nama');
+        $table->string('no_hp')->unique();
+        $table->boolean('status_member')->default(false);
+        $table->date('tanggal_daftar')->nullable();
+        $table->integer('poin')->default(0);
+        $table->timestamps();
         });
     }
 

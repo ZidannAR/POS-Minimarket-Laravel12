@@ -38,7 +38,7 @@ class KasirController extends Controller
 
         session(['keranjang' => $keranjang]);
 
-        return redirect()->back()->with('success', 'Produk ditambahkan ke keranjang.');
+        return redirect()->back();
     }
 
     public function tambah($id)

@@ -21,7 +21,7 @@
                 <input type="text" name="sku" id="barcodeInput" class="form-control" placeholder="Scan barcode di sini" style="width: 300px;">
             </form>
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">  
                     <h6 class="m-0 font-weight-bold text-primary">Daftar Produk</h6>
                 </div>
                 <div class="card-body">
@@ -380,7 +380,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 <!-- Bootstrap CSS -->
