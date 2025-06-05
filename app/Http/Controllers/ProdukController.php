@@ -76,20 +76,19 @@ class ProdukController extends Controller
     public function update(Request $request, string $id)
     {
         $rules = [
-            'nama_produk' => 'required|max:100',
-            'sku'=>'required',
-            'harga'=>'required',
-            'stok'=>'required',
+            'nama_produk' => 'required|string|max:255',
+            'harga'=>'required|max:255',
+            'stok'=>'required|max:100',
             'id_kategori'=>'required|exists:categories,id_kategori',
-            'foto'=>'required|mimes:jpeg,png|max:512'
+            'foto'=>'mimes:jpeg,png|max:512'
         ];
         $request->validate($rules);
 
-        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori','foto'.'sku']);
-        if ($request->hasFile('foto')&& $request->file('foto')->isValid()) {
-            $filename = $input['foto'] . "." . $request->file('foto')->getClientOriginalExtension();
-            $request->file('foto')->move(public_path('upload'),$filename);
-            $input['foto'] = $filename;        
+        $input = $request->only(['nama_produk', 'harga', 'stok', 'id_kategori','foto']);
+        if ($request->hasFile('foto')&& $request -> file('foto')->isValid()){
+            $filename = uniqid(). "." . $request->file('foto')->getClientOriginalExtension();
+            $request-> file('foto')->move(public_path('upload'),$filename);
+            $input['foto']=$filename;     
         }
         $result = \App\Models\produk::where('id_produk',$id);
         $status = $result->update($input);

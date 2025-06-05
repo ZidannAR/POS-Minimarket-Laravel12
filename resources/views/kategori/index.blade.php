@@ -50,5 +50,7 @@
 
 </div>
 <!-- /.container-fluid -->
+ 
 @endsection
+@include('templates.footer')
 

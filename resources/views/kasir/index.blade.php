@@ -21,7 +21,7 @@
                 <input type="text" name="sku" id="barcodeInput" class="form-control" placeholder="Scan barcode di sini" style="width: 300px;">
             </form>
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">  
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Daftar Produk</h6>
                 </div>
                 <div class="card-body">
@@ -131,6 +131,12 @@
                         @csrf
 
                         <div class="form-group">
+                            <label>Nomor Member</label>
+                            <input type="text" id="no_member" name="no_member" class="form-control" placeholder="Masukkan nomor HP member">
+                            <small id="member-info" class="text-success d-none">Member aktif! Diskon 5% diberikan</small>
+                        </div>
+
+                        <div class="form-group">
                             <label>Total yang Harus Dibayar</label>
                             <input type="text" id="total_display" class="form-control" readonly>
                             <input type="hidden" id="total" name="total">
@@ -140,6 +146,7 @@
                             <label>Uang Diberikan</label>
                             <input type="text" id="uang_diberikan" class="form-control" placeholder="Masukkan jumlah uang">
                             <input type="hidden" name="uang_diberikan" id="uang_diberikan_raw">
+                            <input type="hidden" id="total_awal" name="total_awal">
 
 
 
@@ -181,196 +188,223 @@
                     });
                 </script> -->
 
-            
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // ==================== Barcode Scanner Section ====================
-        const barcodeInput = document.getElementById('barcodeInput');
-        const formScanFisik = document.getElementById('formScanFisik');
-        let html5QrCode = null;
 
-        // Scanner Configuration
-        const scannerConfig = {
-            fps: 10,
-            qrbox: 250,
-            formatsToSupport: [
-                Html5QrcodeSupportedFormats.EAN_13,
-                Html5QrcodeSupportedFormats.CODE_128,
-                Html5QrcodeSupportedFormats.UPC_A
-            ]
-        };
-
-        // Initialize Scanner Modal
-        $('#scanBarcodeModal').on('shown.bs.modal', function() {
-            Html5Qrcode.getCameras().then(devices => {
-                if (devices && devices.length) {
-                    html5QrCode = new Html5Qrcode("reader");
-                    html5QrCode.start(
-                        devices[0].id,
-                        scannerConfig,
-                        onScanSuccess,
-                        onScanError
-                    ).catch(console.error);
-                }
-            });
-        });
-
-        // Cleanup Scanner on Modal Close
-        $('#scanBarcodeModal').on('hidden.bs.modal', function() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                    html5QrCode = null;
-                });
-            }
-        });
-
-        // Handle Image Upload
-        document.getElementById('barcodeImageInput').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            try {
-                const result = await Html5Qrcode.scanFile(file, scannerConfig);
-                handleBarcodeResult(result);
-            } catch (err) {
-                showError('Gagal membaca barcode dari gambar');
-            }
-        });
-
-        // Core Scanner Functions
-        function onScanSuccess(decodedText) {
-            handleBarcodeResult(decodedText);
-            $('#scanBarcodeModal').modal('hide');
-        }
-
-        function onScanError(errorMessage) {
-            // Optional: Add error logging
-        }
-
-        function handleBarcodeResult(barcode) {
-            barcodeInput.value = barcode;
-            formScanFisik.dispatchEvent(new Event('submit'));
-        }
-
-        // ==================== Form Handling Section ====================
-        formScanFisik.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            fetch(this.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: formData
-            })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return;
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data?.success) {
-                    window.location.reload();
-                } else if (data?.error) {
-                    showError(data.error);
-                }
-            })
-            .catch(error => {
-                showError('Terjadi kesalahan sistem');
-                console.error('Error:', error);
-            });
-        });
-
-    });
-</script>
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        const inputUang = document.getElementById('uang_diberikan');
-                        const inputUangRaw = document.getElementById('uang_diberikan_raw');
-                        const inputKembalian = document.getElementById('kembalian');
-                        const inputTotal = document.getElementById('total');
-                        const inputTotalDisplay = document.getElementById('total_display');
-                        const formPembayaran = document.getElementById('payment-form');
+                        // ==================== Barcode Scanner Section ====================
+                        const barcodeInput = document.getElementById('barcodeInput');
+                        const formScanFisik = document.getElementById('formScanFisik');
+                        let html5QrCode = null;
 
-                        // Helper: Format Rupiah
-                        function formatRupiah(angka, prefix = 'Rp ') {
-                            let number_string = angka.toString().replace(/[^,\d]/g, ''),
-                                split = number_string.split(','),
-                                sisa = split[0].length % 3,
-                                rupiah = split[0].substr(0, sisa),
-                                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+                        // Scanner Configuration
+                        const scannerConfig = {
+                            fps: 10,
+                            qrbox: 250,
+                            formatsToSupport: [
+                                Html5QrcodeSupportedFormats.EAN_13,
+                                Html5QrcodeSupportedFormats.CODE_128,
+                                Html5QrcodeSupportedFormats.UPC_A
+                            ]
+                        };
 
-                            if (ribuan) {
-                                let separator = sisa ? '.' : '';
-                                rupiah += separator + ribuan.join('.');
-                            }
-
-                            rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
-                            return prefix + rupiah;
-                        }
-
-                        // Helper: Parse Rupiah
-                        function parseRupiah(rupiahString) {
-                            return parseInt(rupiahString.replace(/[^0-9]/g, '')) || 0;
-                        }
-
-                        // Hitung total belanja
-                        function hitungTotal() {
-                            let total = 0;
-                            document.querySelectorAll('.jumlah-input').forEach(input => {
-                                const harga = parseInt(input.dataset.harga);
-                                const jumlah = parseInt(input.value);
-                                total += harga * jumlah;
+                        // Initialize Scanner Modal
+                        $('#scanBarcodeModal').on('shown.bs.modal', function() {
+                            Html5Qrcode.getCameras().then(devices => {
+                                if (devices && devices.length) {
+                                    html5QrCode = new Html5Qrcode("reader");
+                                    html5QrCode.start(
+                                        devices[0].id,
+                                        scannerConfig,
+                                        onScanSuccess,
+                                        onScanError
+                                    ).catch(console.error);
+                                }
                             });
-
-                            inputTotal.value = total;
-                            inputTotalDisplay.value = formatRupiah(total);
-                            return total;
-                        }
-
-                        // Hitung kembalian berdasarkan input uang
-                        function hitungKembalian() {
-                            const total = hitungTotal();
-                            const uang = parseRupiah(inputUang.value);
-                            const kembalian = uang - total;
-
-                            inputKembalian.value = (kembalian >= 0) ?
-                                formatRupiah(kembalian) :
-                                'Uang tidak cukup';
-
-                            inputUangRaw.value = uang;
-                        }
-
-                        // Format input saat user mengetik
-                        inputUang.addEventListener('keyup', function() {
-                            this.value = formatRupiah(this.value);
-                            hitungKembalian();
                         });
 
-                        // Validasi sebelum submit
-                        formPembayaran.addEventListener('submit', function(e) {
-                            const total = parseInt(inputTotal.value);
-                            const uang = parseRupiah(inputUang.value);
-
-                            if (uang < total) {
-                                e.preventDefault();
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'Uang tidak cukup!'
+                        // Cleanup Scanner on Modal Close
+                        $('#scanBarcodeModal').on('hidden.bs.modal', function() {
+                            if (html5QrCode && html5QrCode.isScanning) {
+                                html5QrCode.stop().then(() => {
+                                    html5QrCode.clear();
+                                    html5QrCode = null;
                                 });
                             }
                         });
 
-                        // Inisialisasi awal
-                        hitungTotal();
+                        // Handle Image Upload
+                        document.getElementById('barcodeImageInput').addEventListener('change', async function(e) {
+                            const file = e.target.files[0];
+                            if (!file) return;
+
+                            try {
+                                const result = await Html5Qrcode.scanFile(file, scannerConfig);
+                                handleBarcodeResult(result);
+                            } catch (err) {
+                                showError('Gagal membaca barcode dari gambar');
+                            }
+                        });
+
+                        // Core Scanner Functions
+                        function onScanSuccess(decodedText) {
+                            handleBarcodeResult(decodedText);
+                            $('#scanBarcodeModal').modal('hide');
+                        }
+
+                        function onScanError(errorMessage) {
+                            // Optional: Add error logging
+                        }
+
+                        function handleBarcodeResult(barcode) {
+                            barcodeInput.value = barcode;
+                            formScanFisik.dispatchEvent(new Event('submit'));
+                        }
+
+                        // ==================== Form Handling Section ====================
+                        formScanFisik.addEventListener('submit', function(e) {
+                            e.preventDefault();
+
+                            const formData = new FormData(this);
+
+                            fetch(this.action, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: formData
+                                })
+                                .then(response => {
+                                    if (response.redirected) {
+                                        window.location.href = response.url;
+                                        return;
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data?.success) {
+                                        window.location.reload();
+                                    } else if (data?.error) {
+                                        showError(data.error);
+                                    }
+                                })
+                                .catch(error => {
+                                    showError('Terjadi kesalahan sistem');
+                                    console.error('Error:', error);
+                                });
+                        });
+
                     });
                 </script>
+     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... (kode barcode scanner tetap sama) ...
+
+        // ==================== Payment Section ====================
+        const inputUang = document.getElementById('uang_diberikan');
+        const inputUangRaw = document.getElementById('uang_diberikan_raw');
+        const inputKembalian = document.getElementById('kembalian');
+        const inputTotal = document.getElementById('total');
+        const inputTotalDisplay = document.getElementById('total_display');
+        const formPembayaran = document.getElementById('payment-form');
+
+        // Helper: Format Rupiah
+        function formatRupiah(angka, prefix = 'Rp ') {
+            let number_string = angka.toString().replace(/[^,\d]/g, ''),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix + rupiah;
+        }
+
+        // Helper: Parse Rupiah
+        function parseRupiah(rupiahString) {
+            return parseInt(rupiahString.replace(/[^0-9]/g, '')) || 0;
+        }
+
+        // Hitung total dengan diskon
+        function hitungTotalDenganDiskon() {
+            // Hitung total awal dari keranjang
+            let totalAwal = 0;
+            document.querySelectorAll('.jumlah-input').forEach(input => {
+                const harga = parseInt(input.dataset.harga);
+                const jumlah = parseInt(input.value);
+                totalAwal += harga * jumlah;
+            });
+
+            // Ambil nilai input member
+            const noMember = document.getElementById('no_member').value.trim();
+            const infoElement = document.getElementById('member-info');
+
+            // Berikan diskon 5% jika nomor member diisi
+            let totalSetelahDiskon = totalAwal;
+            if (noMember.length > 0) {
+                const diskon = totalAwal * 0.05;
+                totalSetelahDiskon = totalAwal - diskon;
+                infoElement.classList.remove('d-none');
+            } else {
+                infoElement.classList.add('d-none');
+            }
+
+            // Update nilai di form
+            document.getElementById('total').value = totalSetelahDiskon;
+            document.getElementById('total_display').value = formatRupiah(totalSetelahDiskon);
+
+            return totalSetelahDiskon;
+        }
+
+        // Fungsi untuk hitung kembalian
+        function hitungKembalian() {
+            const total = document.getElementById('total').value;
+            const uang = parseRupiah(document.getElementById('uang_diberikan').value);
+            const kembalian = uang - total;
+
+            // Tampilkan kembalian, jika negatif beri tanda minus
+            document.getElementById('kembalian').value = formatRupiah(kembalian);
+        }
+
+        // Event listener untuk input uang
+        inputUang.addEventListener('input', function() {
+            // Format tampilan
+            this.value = formatRupiah(this.value);
+            // Simpan nilai raw untuk form submit
+            inputUangRaw.value = parseRupiah(this.value);
+            // Hitung kembalian
+            hitungKembalian();
+        });
+
+        // Event listener untuk input member
+        document.getElementById('no_member').addEventListener('input', function() {
+            hitungTotalDenganDiskon();
+            hitungKembaxlian();
+        });
+
+        // Validasi sebelum submit
+        formPembayaran.addEventListener('submit', function(e) {
+            const total = parseInt(document.getElementById('total').value);
+            const uang = parseRupiah(document.getElementById('uang_diberikan').value);
+
+            if (uang < total) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Uang tidak cukup!'
+                });
+            }
+        });
+
+        // Inisialisasi
+        hitungTotalDenganDiskon();
+    });
+</script>
 
 
 

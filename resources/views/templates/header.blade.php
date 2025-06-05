@@ -41,15 +41,16 @@
 
                      <!-- Divider -->
                      <hr class="sidebar-divider my-0">
-
+                           
                      <!-- Nav Item - Dashboard -->
+                      @if (Auth::user()->role === 'admin')
                      <li class="nav-item">
-                            <a class="nav-link" href="{{ url('dashboard') }}">
+                            <a class="nav-link" href="{{ url('/') }}">
                                    <i class="fas fa-fw fa-tachometer-alt"></i>
                                    <span>Dashboard</span></a>
                      </li>
                      <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/') }}">
+                            <a class="nav-link" href="{{ url('kategori') }}">
                                    <i class="fas fa-fw fa-tachometer-alt"></i>
                                    <span>Kategori</span></a>
                      </li>
@@ -59,20 +60,29 @@
                                    <span>Produk</span></a>
                      </li>
                      <li class="nav-item">
-                            <a class="nav-link" href="index.html">
+                            <a class="nav-link" href="{{ url('user') }}">
                             <i class="fas fa-user"></i>
                                    <span>User</span></a>
                      </li>
                      <li class="nav-item">
                             <a class="nav-link" href="{{ url('member') }}">
                             <i class="fas fa-user"></i>
-                                   <span>User</span></a>
+                                   <span>Member</span></a>
+                     </li>
+                     @endif
+                     @if(Auth::user()->role === 'kasir')
+                     <li class="nav-item">
+                            <a class="nav-link" href="{{ url('member') }}">
+                            <i class="fas fa-user"></i>
+                                   <span>member</span></a>
                      </li>
                      <li class="nav-item">
                             <a class="nav-link" href="{{ url('kasir') }}">
                             <i class="fas fa-cash-register"></i> 
                                    <span>Kasir</span></a>
                      </li>
+                     @endif
+                    
 
                      <!-- Divider -->
                      <hr class="sidebar-divider">

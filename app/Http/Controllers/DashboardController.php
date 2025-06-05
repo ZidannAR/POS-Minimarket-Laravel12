@@ -18,6 +18,7 @@ class DashboardController extends Controller
 
         $TotalProduk = \App\Models\produk::count();
         $TotalKategori = \App\Models\kategori::count();
+        $TotalUser = \App\Models\User::count();
 
 
         $penjualanHariIni = Order::whereDate('created_at',today())->sum('total');
@@ -26,6 +27,7 @@ class DashboardController extends Controller
         return view('dashboard.index',compact(
             'TotalProduk', 
         'TotalKategori', 
+        'TotalUser',
         'penjualanHariIni', 
         'transaksiTerakhir'
         ));

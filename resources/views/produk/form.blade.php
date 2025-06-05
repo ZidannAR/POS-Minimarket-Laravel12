@@ -9,7 +9,7 @@
        <div class="card shadow mb-mp4">
               @include('templates.feedback')
               <div class="card-header py-3">
-                     <h6>Data Tamu</h6>
+                     <h6>data produk</h6>
               </div>
               <div class="card-body">
                      <form method="post" action="{{ isset($result) && $result ? route('produk.update', $result->id_produk) : url('produk/add') }}" enctype="multipart/form-data">
@@ -20,27 +20,28 @@
                             <div class="form-group row">
                                    <label class="col-sm-3 col-form-label">Nama Produk</label>
                                    <div class="col-sm-8">
-                                          <input type="text" name="nama_produk" class="form-control">
+                                          <input type="text" name="nama_produk" class="form-control" value="{{ $result->nama_produk ?? old('nama_produk') }}">
                                    </div>
                             </div>
 
                             <div class="form-group row">
                                    <label class="col-sm-3 col-form-label">Stok</label>
                                    <div class="col-sm-8">
-                                          <input type="text" name="stok" class="form-control">
+                                          <input type="text" name="stok" class="form-control" value="{{ $result->stok ?? old('stok') }}">
                                    </div>
                             </div>
 
                             <div class="form-group row">
                                    <label class="col-sm-3 col-form-label">Harga</label>
                                    <div class="col-sm-8">
-                                          <input type="text" name="harga_display" id="harga" class="form-control" autocomplete="off">
+                                          <input type="text" name="harga_display" id="harga" class="form-control" autocomplete="off" value="{{ isset($result->harga) ? number_format($result->harga, 0, ',', '.') : old('harga') }}"
+                                                 placeholder="Masukkan Harga Produk">
                                           <input type="hidden" name="harga" id="harga_raw">
                                    </div>
                             </div>
 
                             <div class="form-group row">
-                                   <label for="id_kategori">Kelas</label>
+                                   <label for="id_kategori">kategori</label>
                                    <select class="form-control" id="id_kategori" name="id_kategori">
                                           @foreach(\App\Models\kategori::all() as $kategori)
                                           <option value="{{ $kategori->id_kategori }}"
@@ -67,7 +68,7 @@
                             <div class="form-group row">
                                    <label class="control-label col-sm-2">Foto</label>
                                    <div class="col-sm-10">
-                                          <input type="file" name="foto" />
+                                          <input type="file" name="foto" value="{{ $result->foto ?? old('foto') }}" />
                                    </div>
                             </div>
 
